@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import styles from './SearchBar.module.css';
 
-const SearchBar = ({onsubmit}) => {
+const SearchBar = ({onSubmit}) => {
     const [query, setQuery] = useState('');
 
     const handleChange = evt => {
@@ -11,27 +10,29 @@ const SearchBar = ({onsubmit}) => {
 
     const handleSubmit = evt => {
         evt.preventDefault();
-        if (query.trim() === '') {
-            return;
+        if (query.trim()) {
+            onSubmit(query);
+            setQuery('');
+        } else {
+            alert('Please enter a search query.');
         }
-        onsubmit(query);
-        setQuery('');
     };
 
     return (
-        <header className={styles.SearchBar}>
-            <form onSubmit={handleSubmit} className={styles.SearchForm}>
+        <header className='SearchBar'>
+            <form onSubmit={handleSubmit}>
                 <input
                 type="text"
                 value={query}
                 onChange={handleChange}
                 autoComplete='off'
                 autoFocus
-                placeholder='Search images and photos'
-                className={styles.SearchFormInput}/>
-                <button type='submit' className={styles.searchFormButton}>Search</button>
+                placeholder='Search images and photos'/>
+                <button type='submit'>Search</button>
             </form>
         </header>
     );
 };
+
+export default SearchBar;
 
