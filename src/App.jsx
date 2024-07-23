@@ -9,7 +9,7 @@ import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import ContactList from './components/ContactList/ContactList';
 import ContactForm from './components/ContactForm/ContactForm';
 import Contact from './components/Contact/Contact';
-import styles from './App.module.css';
+import './App.module.css';
 
 const ACCESS_KEY = '66IyT47tmpZyGjeGf1Wr-sbkVpDcBZUQtmNVPaVjcLk';
 const BASE_URL = 'https://api.unsplash.com';
@@ -24,26 +24,27 @@ const App = () => {
   const [modalImage, setModalImage] = useState(null);
 
   useEffect(() => {
-    if (query) {
-      fetchImages();
-    }
-  }, [query, page]);
+    if (!query) return;
 
   const fetchImages = async () => {
-    setLoading(true);
+    setIsLoading(true);
+    setError(null);
+
     try {
       const response = await axios.get(`https://api.unsplash.com/search/photos?page=${page}&query=${query}&client_id=${ACCESS_KEY}`);
       setImages(prevImages => [...prevImages, ...response.data.results]);
-      setError(null);
     } catch (error) {
       setError('Failed to fetch images');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSearch = query => {
-    setQuery(query);
+  fetchImages();
+}, [query, page]);
+
+  const handleSearch = (searchQuery) => {
+    setQuery(searchQuery);
     setImages([]);
     setPage(1);
   };
@@ -52,24 +53,22 @@ const App = () => {
     setPage(prevPage => prevPage + 1);
   };
 
-  const openModal = image => {
-    setModalImage(image);
-    setShowModal(true);
+  const openModal = (image) => {
+    setSelectedImage(image);
   };
 
   const closeModal = () => {
-    setShowModal(false);
-    setModalImage(null);
+    setSelectedImage(null);
   };
 
   return (
-    <div className={styles.App}>
+    <div className='App'>
       <SearchBar onSubmit={handleSearch} />
       {error && <ErrorMessage message={error} />}
-      <ImageGallery images={images} onImageClick={openModal} />
-      {loading && <Loader />}
-      {images.length > 0 && !loading && <LoadMoreBtn onClick={handleLoadMore} />}
-      {showModal && <ImageModal image={modalImage} onClose={closeModal} />}
+      <ImageGallery images={images} openModal={openModal} />
+      {isLoading && <Loader />}
+      {images.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMore} />}
+      {selectedImage && <ImageModal image={selectedImage} onClose={closeModal} />}
     </div>
   );
 };
