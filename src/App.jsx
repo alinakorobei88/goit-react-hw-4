@@ -6,9 +6,7 @@ import ImageModal from './components/ImageModal/ImageModal';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import ImageCard from './components/ImageCard/ImageCard';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
-import ContactList from './components/ContactList/ContactList';
-import ContactForm from './components/ContactForm/ContactForm';
-import Contact from './components/Contact/Contact';
+import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import './App.module.css';
 
 const ACCESS_KEY = '66IyT47tmpZyGjeGf1Wr-sbkVpDcBZUQtmNVPaVjcLk';
@@ -16,7 +14,7 @@ const BASE_URL = 'https://api.unsplash.com';
 
 const App = () => {
   const [images, setImages] = useState([]);
-  const [query, setQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -24,27 +22,34 @@ const App = () => {
   const [modalImage, setModalImage] = useState(null);
 
   useEffect(() => {
-    if (!query) return;
+    if (!searchQuery) return;
 
   const fetchImages = async () => {
-    setIsLoading(true);
-    setError(null);
-
+    setLoading(true);
     try {
-      const response = await axios.get(`https://api.unsplash.com/search/photos?page=${page}&query=${query}&client_id=${ACCESS_KEY}`);
+      const response = await axios.get(`https://api.unsplash.com/search/photos`, {
+        params: {
+          query: searchQuery,
+          page: page,
+          per_page: 12,
+        },
+        headers: {
+          Authorization: 'Client-ID YOUR_ACCESS_KEY',
+        },
+      });
       setImages(prevImages => [...prevImages, ...response.data.results]);
     } catch (error) {
       setError('Failed to fetch images');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   fetchImages();
-}, [query, page]);
+}, [searchQuery, page]);
 
-  const handleSearch = (searchQuery) => {
-    setQuery(searchQuery);
+  const handleSearch = query => {
+    setSearchQuery(query);
     setImages([]);
     setPage(1);
   };
@@ -55,20 +60,22 @@ const App = () => {
 
   const openModal = (image) => {
     setSelectedImage(image);
+    setShowModal(true);
   };
 
   const closeModal = () => {
-    setSelectedImage(null);
+    setShowModal(false);
+    setModalImage(null);
   };
 
   return (
-    <div className='App'>
+    <div className="App">
       <SearchBar onSubmit={handleSearch} />
       {error && <ErrorMessage message={error} />}
-      <ImageGallery images={images} openModal={openModal} />
-      {isLoading && <Loader />}
-      {images.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMore} />}
-      {selectedImage && <ImageModal image={selectedImage} onClose={closeModal} />}
+      <ImageGallery images={images} onImageClick={openModal} />
+      {loading && <Loader />}
+      {images.length > 0 && !loading && <LoadMoreBtn onClick={handleLoadMore} />}
+      {showModal && <ImageModal image={modalImage} onClose={closeModal} />}
     </div>
   );
 };
