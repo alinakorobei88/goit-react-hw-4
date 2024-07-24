@@ -1,15 +1,19 @@
-import React from 'react';
-import ImageCard from './ImageGallery';
-import './ImageGallery.module.css';
+import css from './ImageGallery.module.css'
+import ImageCard from '../ImageCard/ImageCard'
 
-const ImageGallery = ({images, openModal}) => {
-    return (
-        <ul className='ImageGallery'>
-            {images.map((image) => (
-                <ImageCard key={image.id} image={image} openModal={openModal} />
-            ))}
-        </ul>
-    );
-};
+const ImageGallery = ({images, onImageClick}) => {
+  return (
+    <ul className={css.ul}>
+      {images.map(image => (
+        <li
+          key={image.id}
+          className={css.li}>
+          <ImageCard image={image} onClick={() => onImageClick(image)} />
+	</li>
+      ))}
 
-export default ImageGallery;
+</ul>
+  )
+}
+
+export default ImageGallery

@@ -1,6 +1,6 @@
 import React from 'react';
 import {TailSpin} from 'react-loader-spinner';
-import './Loader.module.css';
+import css from './Loader.module.css';
 
 const Loader = () => (
     <div className="Loader">

@@ -1,38 +1,45 @@
-import React, {useState} from 'react';
-import styles from './SearchBar.module.css';
+import { useState } from "react";
+import toast from 'react-hot-toast'
+import css from './SearchBar.module.css'
 
-const SearchBar = ({onSubmit}) => {
-    const [query, setQuery] = useState('');
 
-    const handleChange = evt => {
-        setQuery(evt.target.value);
-    };
+const SearchBar = ({ onSubmit }) => {
+  const [query, setQuery] = useState('');
+  const handleInputChange = evt => {
+    setQuery(evt.target.value)
+  };
 
-    const handleSubmit = evt => {
-        evt.preventDefault();
-        if (query.trim()) {
-            onSubmit(query);
-            setQuery('');
-        } else {
-            alert('Please enter a search query.');
-        }
-    };
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    if (query.trim() === '') {
+      toast.error('Please enter a search query');
+      return;
+    }
+    onSubmit(query);
+    setQuery('');
+  }
+  return (
+    <div className={css.div}>
+      <form
+        className={css.form}
+      onSubmit={handleSubmit}
+      >
+    < input
+          className={css.input}
+          placeholder='Search...'
+          type="text"
+          value={query}
+          onChange={handleInputChange}
+        />
+        <button
+          type="submit"
+          className={css.btn}>
+          Search
+        </button>
+      </form>
+    </div>
+  )
+}
 
-    return (
-        <header className='SearchBar'>
-            <form onSubmit={handleSubmit}>
-                <input
-                type="text"
-                value={query}
-                onChange={handleChange}
-                autoComplete='off'
-                autoFocus
-                placeholder='Search images and photos'/>
-                <button type='submit'>Search</button>
-            </form>
-        </header>
-    );
-};
-
-export default SearchBar;
+export default SearchBar
 
